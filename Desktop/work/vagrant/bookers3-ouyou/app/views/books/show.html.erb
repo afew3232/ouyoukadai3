@@ -1,0 +1,95 @@
+
+<div class="row">
+	<div class="col-xs-3">
+
+		<h2>User info</h2>
+		<%= render 'users/profile', user: @user %>
+
+		<h2>New book</h2>
+		<%= render 'books/newform', book: @book_new %>
+
+	</div>
+
+	<div class="col-xs-9">
+		<h2>Book detail</h2>
+
+		<table class="table">
+			<% if @book.user_id == current_user.id%>
+				<tr>
+					<td>
+						<%= link_to (@book.user) do %>
+							<%= attachment_image_tag(@book.user, :profile_image, :fill, 100, 100, fallback: "no-image-mini.jpg") %><br>
+							<%= @user.name %>
+						<% end %>
+					</td>
+					<td><%= link_to @book.title, @book %></td>
+					<td><%= @book.body %></td>
+					<% if liked?(current_user.id, @book.id) %> <!--likeされてる-->
+						<td><%= link_to liked_count(@book.id), like_path(@book.id), method: :delete,class: "glyphicon glyphicon-heart" %></td>
+					<% else %><!--likeされてない-->
+						<td><%= link_to liked_count(@book.id), like_path(@book.id), method: :post, class: "glyphicon glyphicon-heart-empty" %></td>
+					<% end %>
+
+					<td>コメント数：<%= comment_count(@book.id) %></td>
+					<td><%= link_to "Edit",edit_book_path(@book), class: "btn-sm btn-success edit_book_#{@book.id}" %></td>
+					<td><%= link_to "Destroy",@book, method: :delete, data: {confirm: "本当に削除してもよろしいですか？"}, class: "btn-sm btn-danger destroy_book_#{@book.id}" %></td>
+				</tr>
+
+				<% else %>
+				<tr>
+					<td>
+						<%= link_to (@book.user) do %>
+							<%= attachment_image_tag(@book.user, :profile_image, :fill, 100, 100, fallback: "no-image-mini.jpg") %><br>
+							<%= @user.name %>
+						<% end %>
+					</td>
+					<td><%= link_to @book.title, @book %></td>
+					<td><%= @book.body %></td>
+					<% if liked?(current_user.id, @book.id) %> <!--likeされてる-->
+						<td><%= link_to liked_count(@book.id), like_path(@book.id), method: :delete,class: "glyphicon glyphicon-heart" %></td>
+					<% else %><!--likeされてない-->
+						<td><%= link_to liked_count(@book.id), like_path(@book.id), method: :post, class: "glyphicon glyphicon-heart-empty" %></td>
+					<% end %>
+
+					<td>コメント数：<%= comment_count(@book.id) %></td>
+					<td></td>
+					<td></td>
+				</tr>
+
+				<% end %>
+			</table>
+
+			<!--コメント表示-->
+			<table>
+				<% @comments.each do |c| %>
+				<!--コメントのbook_id == showしてるbookのid　⇒　コメント表示-->
+				<% if discover_comment(@book.id,c.book_id) %>
+					<tr>
+						<td>
+							<%= link_to (user_path(c.user_id)) do %>
+							<%= attachment_image_tag(@users.find(c.user_id), :profile_image, :fill, 100, 100, fallback: "no-image-mini.jpg") %><br>
+
+							<%= @users.find(c.user_id).name %>
+							<% end %>
+
+						</td>
+						<td><%= c.body %></td>
+						<td><%= link_to "Destroy", comment_path(c.id),method: :delete, class: "btn btn-danger" %></td>
+					</tr>
+					<% end %>
+				<% end %>
+			</table>
+			 <!--コメント入力-->
+			<%= form_for @comment do |c| %>
+				<div>
+					<%= c.text_area :body, class: "comment-text-area" %>
+					<!--comment モデルに入れるデータ -->
+					<%= c.hidden_field :user_id, :value => current_user.id %>
+					<%= c.hidden_field :book_id, :value => @book.id %>
+					<%= c.submit "送信" %>
+				</div>
+			<% end %>
+
+	</div>
+</div>
+
