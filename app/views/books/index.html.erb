@@ -19,7 +19,9 @@
 					<th></th>
 					<th>Title</th>
 					<th>Opinion</th>
-					<th colspan="3"></th>
+					<th></th>
+					<th></th>
+					<th colspan="1"></th>
 				</tr>
 			</thead>
 
@@ -32,7 +34,16 @@
 						<% end %>
 					</td>
 					<td><%= link_to book.title, book, class: "book_#{book.id}" %></td>
+
 					<td><%= book.body %></td>
+
+					<% if favorited?(current_user.id, book.id) %> <!--favoriteされてる-->
+						<td><%= link_to favorited_count(book.id), favorite_path(book.id), method: :delete,class: "glyphicon glyphicon-heart" %></td>
+					<% else %><!--favoriteされてない-->
+						<td><%= link_to favorited_count(book.id), favorite_path(book.id), method: :post, class: "glyphicon glyphicon-heart-empty" %></td>
+					<% end %>
+
+					<td>コメント数：<%= book_comment_count(book.id) %></td>
 				</tr>
 				<% end %>
 			</tbody>
